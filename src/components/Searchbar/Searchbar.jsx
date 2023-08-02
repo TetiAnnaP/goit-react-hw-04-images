@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import styled from 'styled-components';
 import { AiOutlineSearch } from 'react-icons/ai';
 
@@ -57,31 +56,31 @@ const StyledBtn = styled.button`
   }
 `;
 
-export default class Searchbar extends Component {
-  handleSubmit = e => {
+const Searchbar = ({ getUserValue }) => {
+  const handleSubmit = e => {
     e.preventDefault();
     const value = e.target.elements.input.value;
-    this.props.getUserValue(value);
+    getUserValue(value);
   };
 
-  render() {
-    return (
-      <StyledHeader>
-        <form onSubmit={this.handleSubmit}>
-          <StyledBtn type="submit">
-            <AiOutlineSearch />
-          </StyledBtn>
-          <label>
-            <StyledInput
-              name="input"
-              type="text"
-              autoComplete="off"
-              autoFocus
-              placeholder="Search images and photos"
-            />
-          </label>
-        </form>
-      </StyledHeader>
-    );
-  }
-}
+  return (
+    <StyledHeader>
+      <form onSubmit={handleSubmit}>
+        <StyledBtn type="submit">
+          <AiOutlineSearch />
+        </StyledBtn>
+        <label>
+          <StyledInput
+            name="input"
+            type="text"
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+          />
+        </label>
+      </form>
+    </StyledHeader>
+  );
+};
+
+export default Searchbar;

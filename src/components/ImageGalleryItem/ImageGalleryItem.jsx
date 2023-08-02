@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import styled from 'styled-components';
 import { nanoid } from 'nanoid';
 
@@ -18,31 +17,31 @@ const StyledImg = styled.img`
   }
 `;
 
-export default class ImageGalleryItem extends Component {
-  handleClick = e => {
+const ImageGalleryItem = ({ getLargeImgUrl, items }) => {
+  const handleClick = e => {
     e.preventDefault();
     const dataUrl = e.currentTarget.getAttribute('data');
     const alt = e.currentTarget.getAttribute('alt');
 
-    this.props.getLargeImgUrl(dataUrl, alt);
+    getLargeImgUrl(dataUrl, alt);
   };
 
-  render() {
-    return (
-      <>
-        {this.props.items.map(item => {
-          return (
-            <StyledItem key={nanoid()}>
-              <StyledImg
-                src={item.previewURL}
-                alt={item.tags}
-                data={item.largeImageURL}
-                onClick={this.handleClick}
-              />
-            </StyledItem>
-          );
-        })}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      {items.map(item => {
+        return (
+          <StyledItem key={nanoid()}>
+            <StyledImg
+              src={item.previewURL}
+              alt={item.tags}
+              data={item.largeImageURL}
+              onClick={handleClick}
+            />
+          </StyledItem>
+        );
+      })}
+    </>
+  );
+};
+
+export default ImageGalleryItem;

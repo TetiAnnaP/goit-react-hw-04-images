@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 const BackDrop = styled.div`
@@ -18,34 +18,36 @@ const ModalWindow = styled.div`
   max-height: calc(100vh - 24px);
 `;
 
-export default class Modal extends Component {
-  handleBackdropClick = e => {
+const Modal = ({ toggleModal, dataUrl, alt }) => {
+  const handleBackdropClick = e => {
     if (e.target === e.currentTarget) {
-      this.props.toggleModal();
+      toggleModal();
     }
   };
 
-  handleKeyDown = e => {
+  const handleKeyDown = e => {
     if (e.code === 'Escape') {
-      this.props.toggleModal();
+      toggleModal();
     }
   };
 
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+  });
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  });
 
-  render() {
-    return (
-      <BackDrop onClick={this.handleBackdropClick}>
-        <ModalWindow>
-          <img src={this.props.dataUrl} alt={this.props.alt} />
-        </ModalWindow>
-      </BackDrop>
-    );
-  }
-}
+  return (
+    <BackDrop onClick={handleBackdropClick}>
+      <ModalWindow>
+        <img src={dataUrl} alt={alt} />
+      </ModalWindow>
+    </BackDrop>
+  );
+};
+
+export default Modal;

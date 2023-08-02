@@ -5,7 +5,8 @@ import styled, { createGlobalStyle } from 'styled-components';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
-import { Component } from 'react';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 
 const GlobalStyle = createGlobalStyle`
 html {
@@ -42,86 +43,91 @@ const StyledDiv = styled.div`
   padding-bottom: 24px;
 `;
 
-export default class App extends Component {
-  state = {
-    items: [],
-    value: '',
-    error: '',
-    page: 1,
-    visible: false,
-    showModal: false,
-    dataUrl: '',
-    alt: '',
+const App = () => {
+  const [items, setItems] = useState([]);
+  const [value, setValue] = useState('');
+  const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [visible, setVisible] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [dataUrl, setDataUrl] = useState('');
+  const [alt, setAlt] = useState('');
+
+  const getUserValue = value => {
+    setValue(value);
   };
 
-  getUserValue = value => {
-    this.setState({ value });
-  };
+  const getNextImages = () => {
+    const newPage = page + 1;
 
-  getNextImages = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-      visible: true,
-    }));
-    const newValue = this.state.value;
-    const page = this.state.page;
+    setVisible(true);
 
-    GetImages(newValue, page)
+    GetImages(value, newPage)
       .then(resp => {
-        this.setState(prevState => ({
-          items: [...prevState.items, ...resp.hits],
-          visible: false,
-        }));
+        setItems(prev => [...prev, ...resp.hits]);
+        setVisible(false);
+        setPage(newPage);
       })
-      .catch(error => this.setState({ error }));
+      .catch(error => setError(error));
   };
 
-  getLargeImage = (dataUrl, alt) => {
-    this.setState({ dataUrl, alt, showModal: true });
+  const getLargeImage = (dataUrl, alt) => {
+    setDataUrl(dataUrl);
+    setAlt(alt);
+    setShowModal(true);
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    const newValue = this.state.value;
+  useEffect(() => {
+    if (value.trim() !== '') {
+      setPage(1);
+      setVisible(true);
 
-    if (prevState.value !== newValue) {
-      this.setState({ visible: true });
-      const { page } = this.state;
-      GetImages(newValue, page)
-        .then(resp =>
-          this.setState({
-            items: resp.hits,
-            visible: false,
-          })
-        )
-        .catch(error => this.setState({ error: error.message }));
+      GetImages(value)
+        .then(resp => {
+          setItems(resp.hits);
+          setVisible(false);
+        })
+        .catch(error => setError(error.message));
     }
-  }
+  }, [value]);
 
-  render() {
-    return (
-      <StyledDiv>
-        <GlobalStyle />
-        <Searchbar getUserValue={this.getUserValue} />
-        <Loader visible={this.state.visible} />
-        <ImageGalery
-          items={this.state.items}
-          getLargeImage={this.getLargeImage}
-        />
-        {this.state.items.length > 0 && (
-          <Button getNextImages={this.getNextImages} />
-        )}
-        {this.state.showModal && (
-          <Modal
-            dataUrl={this.state.dataUrl}
-            alt={this.state.alt}
-            toggleModal={this.toggleModal}
-          />
-        )}
-      </StyledDiv>
-    );
-  }
-}
+  return (
+    <StyledDiv>
+      <GlobalStyle />
+      <Searchbar getUserValue={getUserValue} />
+      <Loader visible={visible} />
+      <ImageGalery items={items} getLargeImage={getLargeImage} />
+      {items.length > 0 && <Button getNextImages={getNextImages} />}
+      {showModal && (
+        <Modal dataUrl={dataUrl} alt={alt} toggleModal={toggleModal} />
+      )}
+      {error && <div>{error}</div>}
+    </StyledDiv>
+  );
+};
+
+App.propTypes = {
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      previewURL: PropTypes.string,
+      tags: PropTypes.string,
+      largeImageURL: PropTypes.string,
+    })
+  ),
+  value: PropTypes.string,
+  page: PropTypes.number,
+  visible: PropTypes.bool,
+  showModal: PropTypes.bool,
+  dataUrl: PropTypes.string,
+  alt: PropTypes.string,
+  getUserValue: PropTypes.func,
+  getLargeImage: PropTypes.func,
+  getNextImages: PropTypes.func,
+  toggleModal: PropTypes.func,
+};
+
+export default App;

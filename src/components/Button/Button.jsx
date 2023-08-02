@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import styled from 'styled-components';
 
 const StyledLoadMoreBtn = styled.button`
@@ -30,16 +29,16 @@ const StyledLoadMoreBtn = styled.button`
   }
 `;
 
-export default class Button extends Component {
-  handleLoadMoreBtn = () => {
-    this.props.getNextImages();
+const Button = ({ getNextImages }) => {
+  const handleLoadMoreBtn = () => {
+    getNextImages();
   };
 
-  render() {
-    return (
-      <StyledLoadMoreBtn type="button" onClick={this.handleLoadMoreBtn}>
-        Load more
-      </StyledLoadMoreBtn>
-    );
-  }
-}
+  return (
+    <StyledLoadMoreBtn type="button" onClick={handleLoadMoreBtn}>
+      Load more
+    </StyledLoadMoreBtn>
+  );
+};
+
+export default Button;

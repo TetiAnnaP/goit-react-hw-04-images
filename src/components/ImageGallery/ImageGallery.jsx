@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import styled from 'styled-components';
 
@@ -15,21 +14,18 @@ const StyledUl = styled.ul`
   margin-right: auto;
 `;
 
-export default class ImageGalery extends Component {
-  getLargeImgUrl = (dataUrl, alt) => {
-    this.props.getLargeImage(dataUrl, alt);
+const ImageGalery = ({ getLargeImage, items }) => {
+  const getLargeImgUrl = (dataUrl, alt) => {
+    getLargeImage(dataUrl, alt);
   };
 
-  render() {
-    return (
-      <>
-        <StyledUl>
-          <ImageGalleryItem
-            items={this.props.items}
-            getLargeImgUrl={this.getLargeImgUrl}
-          />
-        </StyledUl>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <StyledUl>
+        <ImageGalleryItem items={items} getLargeImgUrl={getLargeImgUrl} />
+      </StyledUl>
+    </>
+  );
+};
+
+export default ImageGalery;
